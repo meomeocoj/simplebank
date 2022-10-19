@@ -1,0 +1,27 @@
+name: Basic test CI setup
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+    - name: Install Go task 
+      run : sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+    - name: Install Go migrate
+      run : |
+            curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+            mv migrate /usr/bin
+    - name: Migration database
+      run: task migrateup
+    - name: Test
+      run: task test
