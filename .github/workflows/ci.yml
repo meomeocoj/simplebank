@@ -7,7 +7,23 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:14-alpine
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: simplebank
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     runs-on: ubuntu-latest 
     steps:
     - uses: actions/checkout@v3
@@ -22,6 +38,6 @@ jobs:
             curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
             mv migrate ~/bin
     - name: Migration database
-      run: task migrateup
+      run: ~/bin/task migrateup
     - name: Test
-      run: task test
+      run: ~/bin/task test
