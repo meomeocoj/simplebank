@@ -19,3 +19,5 @@ tasks:
   test:
     go test ./... -v -cover
 
+  start: 
+    go run main.go

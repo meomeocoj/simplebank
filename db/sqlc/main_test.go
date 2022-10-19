@@ -7,11 +7,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-)
-
-const (
-	dataDriver = "postgres"
-	dataSource = "postgres://root:secret@localhost:6432/simplebank?sslmode=disable"
+	"github.com/meomeocoj/simplebank/utils"
 )
 
 var testingQueries *Queries
@@ -20,7 +16,11 @@ var db *sql.DB
 
 func TestMain(m *testing.M) {
 	var err error
-	db, err = sql.Open(dataDriver, dataSource)
+	config, err := utils.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("Connection error: ", err)
+	}
+	db, err = sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("Connection error: ", err)
 	}
