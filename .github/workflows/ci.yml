@@ -36,7 +36,8 @@ jobs:
     - name: Install Go migrate
       run : |
             curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
-            mv migrate ~/bin
+            mv migrate /usr/bin/migrate
+            which migrate
     - name: Migration database
       run: ~/bin/task migrateup
     - name: Test
