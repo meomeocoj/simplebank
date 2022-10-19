@@ -16,11 +16,11 @@ jobs:
       with:
         go-version: 1.19
     - name: Install Go task 
-      run : sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+      run : sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/bin
     - name: Install Go migrate
       run : |
             curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
-            mv migrate /usr/bin
+            mv migrate ~/bin
     - name: Migration database
       run: task migrateup
     - name: Test
