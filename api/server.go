@@ -25,6 +25,13 @@ func NewServer(config utils.Config, store db.Store) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Setup currency validator
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", validateCurrency)
+	}
+
 	server := &Server{
 		store:               store,
 		tokenMaker:          maker,
@@ -35,19 +42,15 @@ func NewServer(config utils.Config, store db.Store) (*Server, error) {
 
 func (server *Server) setUpRouter() {
 	router := gin.Default()
-
-	router.POST("/accounts", server.createAccount)
-	router.GET("/accounts/:id", server.getAccount)
-	router.GET("/accounts", server.listAccounts)
-
-	router.POST("/transfers", server.createTransfer)
-
 	router.POST("/users", server.createUser)
-	router.POST("/login", server.login)
+	router.POST("/users/login", server.login)
 
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("currency", validateCurrency)
-	}
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	authRoutes.POST("/accounts", server.createAccount)
+	authRoutes.GET("/accounts/:id", server.getAccount)
+	authRoutes.GET("/accounts", server.listAccounts)
+	authRoutes.POST("/transfers", server.createTransfer)
 
 	server.router = router
 }

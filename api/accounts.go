@@ -12,7 +12,6 @@ import (
 )
 
 type createAccountRequest struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,oneof=AUG USD VND EUR"`
 }
 
@@ -23,13 +22,14 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
-	payload := ctx.MustGet(authorizationKey).(*token.Payload)
+	payload := ctx.MustGet(authorizationPayload).(*token.Payload)
 
 	res, err := s.store.CreateAccount(ctx, db.CreateAccountParams{
 		Owner:    payload.Username,
 		Currency: req.Currency,
 		Balance:  0,
 	})
+
 	if pqError, ok := err.(*pq.Error); ok {
 		switch pqError.Code.Name() {
 		case "unique_violation", "foreign_key_violation":
@@ -37,12 +37,13 @@ func (s *Server) createAccount(ctx *gin.Context) {
 			return
 		}
 	}
+
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
-	} else {
-		ctx.JSON(http.StatusCreated, res)
 	}
+
+	ctx.JSON(http.StatusCreated, res)
 
 }
 
@@ -67,7 +68,7 @@ func (s *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
-	payload := ctx.MustGet(authorizationKey).(*token.Payload)
+	payload := ctx.MustGet(authorizationPayload).(*token.Payload)
 
 	if account.Owner != payload.Username {
 		err = errors.New("account doesn't belong to the authenticated user")
@@ -80,7 +81,7 @@ func (s *Server) getAccount(ctx *gin.Context) {
 
 type listQuery struct {
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=1,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 func (s *Server) listAccounts(ctx *gin.Context) {
@@ -89,8 +90,10 @@ func (s *Server) listAccounts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+	payload := ctx.MustGet(authorizationPayload).(*token.Payload)
 
 	accounts, err := s.store.ListAccounts(ctx, db.ListAccountsParams{
+		Owner:  payload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	})
