@@ -19,7 +19,12 @@ func main() {
 		log.Fatal("connection fail:", err)
 	}
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+
+	server, err := api.NewServer(config, store)
+
+	if err != nil {
+		log.Fatal("server start fail:", err)
+	}
 	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("server start fail:", err)
@@ -27,8 +32,4 @@ func main() {
 		log.Println("server started successfully at", config.ServerAddress)
 	}
 
-}
-
-func NewStore(db *sql.DB) {
-	panic("unimplemented")
 }

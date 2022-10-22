@@ -1,13 +1,19 @@
 package utils
 
-import "github.com/spf13/viper"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 // Config store all configuration of application
 // The values are read by viper from a config file or enviroment variable
 type Config struct {
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_Source"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	DBDriver            string        `mapstructure:"DB_DRIVER"`
+	DBSource            string        `mapstructure:"DB_Source"`
+	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
+	TokenSecret         string        `mapstructure:"TOKEN_SECRET"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 // loadConfig reads configuration from a yml or enviroment variable
