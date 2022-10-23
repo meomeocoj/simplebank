@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+    - POSTGRES_USER=root
+    - POSTGRES_PASSWORD=secret
+    - POSTGRES_DB=simplebank
+    healthcheck:
+      test: pg_isready -d "$POSTGRES_DB"
+      interval: 15s
+      retries: 3
+  api:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - DB_SOURCE=postgres://root:secret@postgres:5432/simplebank?sslmode=disable
+    ports:
+      - 5000:5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "task migrateup && task start"
+    
+        
