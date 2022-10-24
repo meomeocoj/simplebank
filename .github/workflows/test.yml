@@ -1,5 +1,4 @@
-name: Basic test CI setup
-
+name: Run the test
 on:
   push:
     branches: [ "main" ]
@@ -29,7 +28,8 @@ jobs:
           - 6432:5432
     runs-on: ubuntu-latest 
     steps:
-    - uses: actions/checkout@v3
+    - name: Set up github action
+      uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
