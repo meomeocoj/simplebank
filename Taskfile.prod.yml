@@ -1,11 +1,13 @@
 version: '3'
 
+dotenv: ['app.env']  
+
 tasks:
   migrateup:
-    migrate -path db/migration -database "postgres://root:secret@postgres:5432/simplebank?sslmode=disable" -verbose up {{.number}}
+    migrate -path db/migration -database $DB_SOURCE -verbose up {{.number}}
 
   migratedown:
-    migrate -path db/migration -database "postgres://root:secret@postgres:5432/simplebank?sslmode=disable" -verbose down {{.number}}
+    migrate -path db/migration -database $DB_SOURCE  -verbose down {{.number}}
 
   test:
     go test ./... -v -cover

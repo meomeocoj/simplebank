@@ -1,5 +1,7 @@
 version: '3'
 
+dotenv: ['app.env']  
+
 tasks:
   postgres:
     docker run --name postgres14 -p 6432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
@@ -11,10 +13,10 @@ tasks:
     docker exec -it postgres14 createdb --username=root --owner=root simplebank
 
   migrateup:
-    migrate -path db/migration -database "postgres://root:secret@localhost:6432/simplebank?sslmode=disable" -verbose up {{.number}}
+    migrate -path db/migration -database $DB_SOURCE -verbose up {{.number}}
 
   migratedown:
-    migrate -path db/migration -database "postgres://root:secret@localhost:6432/simplebank?sslmode=disable" -verbose down {{.number}}
+    migrate -path db/migration -database $DB_SOURCE  -verbose down {{.number}}
 
   test:
     go test ./... -v -cover
