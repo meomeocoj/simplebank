@@ -6,7 +6,7 @@ RUN  curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /app/bin
 RUN go build -o main main.go
 
-FROM --platform=linux/amd64 alpine:3.15
+FROM alpine:3.15
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate /usr/bin/migrate
