@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: simplebank-api-deployment
-        image: 422191248826.dkr.ecr.ap-southeast-1.amazonaws.com/simplebank:42a7c77e75335943e08b0e7cf375baf0a534feea
+        image: 422191248826.dkr.ecr.ap-southeast-1.amazonaws.com/simplebank:356d7022abbcf6769824e2fbb9a5382e5760d8e0-linux-arm64
         ports:
         - containerPort: 5000 
