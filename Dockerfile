@@ -15,3 +15,4 @@ COPY app.env app.env
 COPY db/migration ./db/migration
 COPY Taskfile.prod.yml Taskfile.yaml
 EXPOSE 5000
+CMD task start
