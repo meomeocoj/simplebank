@@ -21,6 +21,9 @@ jobs:
 
     - name: Write the app.env with secrets
       run : aws secretsmanager get-secret-value --secret-id simplebank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
+    
+    - name: Update kube configure with aws 
+      run : aws eks update-kubeconfig --name simplebank --region ap-southeast-1
 
     - name: Build, tag, and push docker image to Amazon ECR Public
       env:
@@ -28,7 +31,15 @@ jobs:
         REPOSITORY: simplebank
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
+        docker push -a $REGISTRY/$REPOSITORY
+    - name: Deployment image to AWS eks
+      run: |
+        kubectl apply -f auth-aws.yaml
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        kubectl apply -f issuer.yaml
+        kubectl apply -f ingress.yaml
+
 
 
