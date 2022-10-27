@@ -42,7 +42,7 @@ func TestGetAccount(t *testing.T) {
 				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(acc.ID)).Times(1).Return(acc, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
+				require.Equal(t, http.StatusCreated, recorder.Code)
 			},
 		},
 		{
@@ -109,7 +109,9 @@ func TestGetAccount(t *testing.T) {
 
 func TestCreateAccount(t *testing.T) {
 	user, _ := randomUser(t)
+
 	acc := randomAccount(user.Username)
+
 	testCases := []struct {
 		name          string
 		body          gin.H
@@ -291,7 +293,7 @@ func randomAccount(owner string) db.Account {
 		ID:       utils.RandomInt(10, 1000),
 		Owner:    owner,
 		Balance:  utils.RandomInt(10, 100),
-		Currency: utils.RandomCurrency(),
+		Currency: "USD",
 	}
 }
 
